@@ -16,9 +16,8 @@ st.title("📚 Hybrid Book Recommender System")
 st.markdown("Combines Content-Based, Collaborative, and Knowledge Graph filtering.")
 
 # ----------------------------------------
-# 📦 Load Data
+# 📦 Load Book Data
 # ----------------------------------------
-@st.cache_resource
 @st.cache_data
 def load_data():
     df = pd.read_csv("books.csv", on_bad_lines='skip')
@@ -27,19 +26,20 @@ def load_data():
     df['language_code'] = df['language_code'].fillna('')
     df['title'] = df['title'].fillna('')
     df['average_rating'] = df['average_rating'].fillna(0)
-
-    # Ensure user_id column exists
+    
     if 'user_id' not in df.columns:
         df['user_id'] = pd.Series(range(1, len(df) + 1))
     df['user_id'] = df['user_id'].astype(int)
     return df
 
+df = load_data()
+
 # ----------------------------------------
-# 📥 Download CBF model from Google Drive
+# ☁️ Download and Load Large CBF File from Google Drive
 # ----------------------------------------
 @st.cache_resource
 def load_cbf_model():
-    file_id = "1oafJ95wpLUiyBMH4eDuSH9IQlyP3p4wx"
+    file_id = "1yvm933TKSW2IG0AmPAXIdSvzonf2xT5a"
     url = f"https://drive.google.com/uc?id={file_id}"
     output = "cbf_sim_df.pkl.gz"
 
@@ -50,7 +50,7 @@ def load_cbf_model():
         return joblib.load(f)
 
 # ----------------------------------------
-# 💾 Load Models
+# 💾 Load Precomputed Models
 # ----------------------------------------
 @st.cache_resource
 def load_models():
