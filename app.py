@@ -16,30 +16,11 @@ st.title("📚 Hybrid Book Recommender System")
 st.markdown("Combines Content-Based, Collaborative, and Knowledge Graph filtering.")
 
 # ----------------------------------------
-# 📦 Load Book Data
-# ----------------------------------------
-@st.cache_data
-def load_data():
-    df = pd.read_csv("books.csv", on_bad_lines='skip')
-    df['authors'] = df['authors'].fillna('')
-    df['publisher'] = df['publisher'].fillna('')
-    df['language_code'] = df['language_code'].fillna('')
-    df['title'] = df['title'].fillna('')
-    df['average_rating'] = df['average_rating'].fillna(0)
-    
-    if 'user_id' not in df.columns:
-        df['user_id'] = pd.Series(range(1, len(df) + 1))
-    df['user_id'] = df['user_id'].astype(int)
-    return df
-
-df = load_data()
-
-# ----------------------------------------
-# ☁️ Download and Load Large CBF File from Google Drive
+# 📥 Download CBF model from Google Drive
 # ----------------------------------------
 @st.cache_resource
 def load_cbf_model():
-    file_id = "1yvm933TKSW2IG0AmPAXIdSvzonf2xT5a"
+    file_id = "1yvm933TKSW2IG0AmPAXIdSvzonf2xT5a"  # cbf_sim_df.pkl.gz
     url = f"https://drive.google.com/uc?id={file_id}"
     output = "cbf_sim_df.pkl.gz"
 
@@ -50,14 +31,28 @@ def load_cbf_model():
         return joblib.load(f)
 
 # ----------------------------------------
-# 💾 Load Precomputed Models
+# 📥 Download user_book_matrix from Google Drive
+# ----------------------------------------
+@st.cache_resource
+def load_user_book_matrix():
+    file_id = "1ZdavU4RIUABgTHx0xio2jJbmlLc2Ravc"  # user_book_matrix.pkl
+    url = f"https://drive.google.com/uc?id={file_id}"
+    output = "user_book_matrix.pkl"
+
+    if not os.path.exists(output):
+        gdown.download(url, output, quiet=False)
+
+    return joblib.load(output)
+
+# ----------------------------------------
+# 💾 Load Models
 # ----------------------------------------
 @st.cache_resource
 def load_models():
     return {
         "tfidf_matrix": joblib.load("tfidf_matrix.pkl"),
         "cbf_sim_df": load_cbf_model(),
-        "user_book_matrix": joblib.load("user_book_matrix.pkl"),
+        "user_book_matrix": load_user_book_matrix(),
         "user_similarity": joblib.load("user_similarity.pkl"),
         "kg_graph": pickle.load(open("knowledge_graph.pickle", "rb"))
     }
@@ -68,6 +63,24 @@ cbf_sim_df = models["cbf_sim_df"]
 user_book_matrix = models["user_book_matrix"]
 user_similarity = models["user_similarity"]
 G = models["kg_graph"]
+
+# ----------------------------------------
+# 🧠 Load Sample Data (Replace with yours if needed)
+# ----------------------------------------
+@st.cache_data
+def load_data():
+    df = pd.read_csv("books.csv", on_bad_lines='skip')
+    df['authors'] = df['authors'].fillna('')
+    df['publisher'] = df['publisher'].fillna('')
+    df['language_code'] = df['language_code'].fillna('')
+    df['title'] = df['title'].fillna('')
+    df['average_rating'] = df['average_rating'].fillna(0)
+    if 'user_id' not in df.columns:
+        df['user_id'] = pd.Series(range(1, len(df) + 1))
+    df['user_id'] = df['user_id'].astype(int)
+    return df
+
+df = load_data()
 
 # ----------------------------------------
 # 🔍 Recommendation Functions
