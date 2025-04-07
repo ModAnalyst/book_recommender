@@ -4,3 +4,5 @@ numpy
 scikit-learn
 netwokx
 joblib
+gdown
+gzip
