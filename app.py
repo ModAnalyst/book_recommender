@@ -1,73 +1,61 @@
-# app.py
 import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
 import networkx as nx
 import pickle
+import gzip
 
 # ----------------------------------------
-# Page Config
+# 🎯 Streamlit Page Config
 # ----------------------------------------
 st.set_page_config(page_title="📚 Hybrid Book Recommender", layout="wide")
+st.title("📚 Hybrid Book Recommender System")
+st.markdown("Combines Content-Based, Collaborative, and Knowledge Graph filtering.")
 
 # ----------------------------------------
-# Styled Header
-# ----------------------------------------
-st.markdown("""
-<div style='text-align: center; padding: 10px 0 0 0;'>
-    <h1 style='color:#ff6347;'>📚 Hybrid Book Recommender</h1>
-    <p style='font-size: 18px;'>Get personalized book suggestions using Content, Collaborative, and Knowledge Graph Filtering.</p>
-</div>
-""", unsafe_allow_html=True)
-
-# ----------------------------------------
-# Sidebar Style & Inputs
-# ----------------------------------------
-st.markdown("""
-    <style>
-    .st-emotion-cache-1lcbmhc {
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        padding: 15px;
-    }
-    div.stButton > button:first-child {
-        background-color: #FF4B4B;
-        color: white;
-        font-weight: bold;
-        border-radius: 10px;
-        height: 3em;
-        width: 100%;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-with st.sidebar:
-    st.header("🔍 Search for a Book")
-    search_option = st.radio("Search by:", ["Title", "Author", "Publisher"])
-    search_query = st.text_input(f"Enter part of the {search_option.lower()}")
-
-# ----------------------------------------
-# Load Data & Models
+# 📦 Load Data
 # ----------------------------------------
 @st.cache_data
 def load_data():
     df = pd.read_csv('/content/drive/MyDrive/books.csv', on_bad_lines='skip')
-    df.fillna({'authors': '', 'publisher': '', 'language_code': '', 'title': '', 'average_rating': 0}, inplace=True)
+    df['authors'] = df['authors'].fillna('')
+    df['publisher'] = df['publisher'].fillna('')
+    df['language_code'] = df['language_code'].fillna('')
+    df['title'] = df['title'].fillna('')
+    df['average_rating'] = df['average_rating'].fillna(0)
+
+    # Ensure user_id column exists
     if 'user_id' not in df.columns:
         df['user_id'] = pd.Series(range(1, len(df) + 1))
     df['user_id'] = df['user_id'].astype(int)
     return df
 
 df = load_data()
-tfidf_matrix = joblib.load('/content/tfidf_matrix.pkl')
-cbf_sim_df = joblib.load('/content/cbf_sim_df.pkl')
-user_book_matrix = joblib.load('/content/user_book_matrix.pkl')
-user_similarity = joblib.load('/content/user_similarity.pkl')
-G = pickle.load(open('/content/knowledge_graph.pickle', 'rb'))
 
 # ----------------------------------------
-# Recommendation Functions
+# 💾 Load Precomputed Models
+# ----------------------------------------
+@st.cache_resource
+def load_models():
+    return {
+        "tfidf_matrix": joblib.load('/content/tfidf_matrix.pkl'),
+        #"cbf_sim_df": joblib.load('/content/cbf_sim_df.pkl'),
+        "cbf_sim_df": joblib.load(gzip.open('/content/cbf_sim_df.pkl.gz', 'rb')),
+        "user_book_matrix": joblib.load('/content/user_book_matrix.pkl'),
+        "user_similarity": joblib.load('/content/user_similarity.pkl'),
+        "kg_graph": pickle.load(open('/content/knowledge_graph.pickle', 'rb'))
+    }
+
+models = load_models()
+tfidf_matrix = models["tfidf_matrix"]
+cbf_sim_df = models["cbf_sim_df"]
+user_book_matrix = models["user_book_matrix"]
+user_similarity = models["user_similarity"]
+G = models["kg_graph"]
+
+# ----------------------------------------
+# 🔍 Recommendation Functions
 # ----------------------------------------
 def recommend_cbf(book_id, top_n=5):
     if book_id not in cbf_sim_df.index:
@@ -109,7 +97,14 @@ def hybrid_recommend(user_id, book_id, top_n=5):
     return titles
 
 # ----------------------------------------
-# Run Recommendation
+# 🎛️ Sidebar Search Interface
+# ----------------------------------------
+st.sidebar.header("🔍 Search for a Book")
+search_option = st.sidebar.radio("Search by:", ["Title", "Author", "Publisher"])
+search_query = st.sidebar.text_input(f"Enter part of the {search_option.lower()}")
+
+# ----------------------------------------
+# 🚀 Run Recommendation
 # ----------------------------------------
 if st.sidebar.button("📖 Recommend Books") and search_query:
     if search_option == "Title":
@@ -121,27 +116,14 @@ if st.sidebar.button("📖 Recommend Books") and search_query:
 
     if not match.empty:
         book_id = match.iloc[0]['bookID']
-        book_title = match.iloc[0]['title']
-        user_id = 1  # Default user
-        st.markdown(f"✅ **Recommendations based on:** _{book_title}_")
-
+        user_id = 1  # Default user since we're not asking for input
         with st.spinner("Generating recommendations..."):
             recs = hybrid_recommend(user_id, book_id, top_n=5)
 
         if not recs.empty:
             st.subheader("📚 Recommended Books")
-            st.dataframe(recs.set_index('bookID'), use_container_width=True)
+            st.table(recs.set_index('bookID'))
         else:
-            st.warning("No recommendations found.")
+            st.warning("⚠️ No recommendations found.")
     else:
-        st.warning("❌ No matching books found.")
-
-# ----------------------------------------
-# Footer
-# ----------------------------------------
-st.markdown("""
-<hr style='border: 1px solid #eee;' />
-<p style='text-align: center; font-size: 14px; color: gray;'>
-  🚀 Built with ❤️ using Streamlit · Hybrid Recommendation System · 2024
-</p>
-""", unsafe_allow_html=True)
+        st.warning(f"❌ No books found for '{search_query}'. Try another keyword.")
