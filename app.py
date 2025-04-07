@@ -19,17 +19,20 @@ st.markdown("Combines Content-Based, Collaborative, and Knowledge Graph filterin
 # 📦 Load Data
 # ----------------------------------------
 @st.cache_resource
-def load_cbf_model():
-    file_id = "1yvm933TKSW2IG0AmPAXIdSvzonf2xT5a"  # New file ID from Google Drive
-    url = f"https://drive.google.com/uc?id={file_id}"
-    output = "cbf_sim_df.pkl.gz"
+@st.cache_data
+def load_data():
+    df = pd.read_csv("books.csv", on_bad_lines='skip')
+    df['authors'] = df['authors'].fillna('')
+    df['publisher'] = df['publisher'].fillna('')
+    df['language_code'] = df['language_code'].fillna('')
+    df['title'] = df['title'].fillna('')
+    df['average_rating'] = df['average_rating'].fillna(0)
 
-    if not os.path.exists(output):
-        gdown.download(url, output, quiet=False)
-
-    with gzip.open(output, "rb") as f:
-        return joblib.load(f)
-df = load_data()
+    # Ensure user_id column exists
+    if 'user_id' not in df.columns:
+        df['user_id'] = pd.Series(range(1, len(df) + 1))
+    df['user_id'] = df['user_id'].astype(int)
+    return df
 
 # ----------------------------------------
 # 📥 Download CBF model from Google Drive
