@@ -5,6 +5,8 @@ import joblib
 import networkx as nx
 import pickle
 import gzip
+import os
+import gdown
 
 # ----------------------------------------
 # 🎯 Streamlit Page Config
@@ -18,14 +20,13 @@ st.markdown("Combines Content-Based, Collaborative, and Knowledge Graph filterin
 # ----------------------------------------
 @st.cache_data
 def load_data():
-    df = pd.read_csv('/content/drive/MyDrive/books.csv', on_bad_lines='skip')
+    df = pd.read_csv('books.csv', on_bad_lines='skip')  # LOCAL for Streamlit
     df['authors'] = df['authors'].fillna('')
     df['publisher'] = df['publisher'].fillna('')
     df['language_code'] = df['language_code'].fillna('')
     df['title'] = df['title'].fillna('')
     df['average_rating'] = df['average_rating'].fillna(0)
 
-    # Ensure user_id column exists
     if 'user_id' not in df.columns:
         df['user_id'] = pd.Series(range(1, len(df) + 1))
     df['user_id'] = df['user_id'].astype(int)
@@ -34,17 +35,31 @@ def load_data():
 df = load_data()
 
 # ----------------------------------------
-# 💾 Load Precomputed Models
+# 📥 Download CBF model from Google Drive
+# ----------------------------------------
+@st.cache_resource
+def load_cbf_model():
+    file_id = "1oafJ95wpLUiyBMH4eDuSH9IQlyP3p4wx"
+    url = f"https://drive.google.com/uc?id={file_id}"
+    output = "cbf_sim_df.pkl.gz"
+
+    if not os.path.exists(output):
+        gdown.download(url, output, quiet=False)
+
+    with gzip.open(output, "rb") as f:
+        return joblib.load(f)
+
+# ----------------------------------------
+# 💾 Load Models
 # ----------------------------------------
 @st.cache_resource
 def load_models():
     return {
-        "tfidf_matrix": joblib.load('/content/tfidf_matrix.pkl'),
-        #"cbf_sim_df": joblib.load('/content/cbf_sim_df.pkl'),
-        "cbf_sim_df": joblib.load(gzip.open('/content/cbf_sim_df.pkl.gz', 'rb')),
-        "user_book_matrix": joblib.load('/content/user_book_matrix.pkl'),
-        "user_similarity": joblib.load('/content/user_similarity.pkl'),
-        "kg_graph": pickle.load(open('/content/knowledge_graph.pickle', 'rb'))
+        "tfidf_matrix": joblib.load("tfidf_matrix.pkl"),
+        "cbf_sim_df": load_cbf_model(),
+        "user_book_matrix": joblib.load("user_book_matrix.pkl"),
+        "user_similarity": joblib.load("user_similarity.pkl"),
+        "kg_graph": pickle.load(open("knowledge_graph.pickle", "rb"))
     }
 
 models = load_models()
@@ -116,7 +131,7 @@ if st.sidebar.button("📖 Recommend Books") and search_query:
 
     if not match.empty:
         book_id = match.iloc[0]['bookID']
-        user_id = 1  # Default user since we're not asking for input
+        user_id = 1
         with st.spinner("Generating recommendations..."):
             recs = hybrid_recommend(user_id, book_id, top_n=5)
 
