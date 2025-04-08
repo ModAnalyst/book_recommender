@@ -353,7 +353,6 @@
 # </div>
 # """, unsafe_allow_html=True)
 
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -386,10 +385,11 @@ st.markdown("""
         color: #000000;
     }
     .header-image {
-        width: 100%;
-        height: auto;
-        border-radius: 0px;
-        margin-bottom: 10px;
+        width: auto;
+        max-height: 200px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
     }
     .footer {
         position: fixed;
@@ -408,10 +408,14 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------
-# 🖼️ Header Image
+# 🖼️ Header Image and Title
 # ----------------------------
 st.markdown("""
-    <img src="https://i.imgur.com/JqfweEM.png" class="header-image" />
+    <div style="text-align: center;">
+        <img src="https://i.imgur.com/JqfweEM.png" class="header-image" />
+        <h1 style="margin-top: 10px; font-size: 32px; color: #333333;">📚 Book Recommender App</h1>
+        <p style="font-size: 16px; color: #555;">Combining Content-Based, Collaborative, and Knowledge Graph Recommendations.</p>
+    </div>
 """, unsafe_allow_html=True)
 
 # ----------------------------
@@ -549,3 +553,4 @@ st.markdown("""
     Mofoluke Sorinmade © 2025
 </div>
 """, unsafe_allow_html=True)
+
