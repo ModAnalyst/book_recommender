@@ -25,25 +25,31 @@ st.markdown("""
         font-family: 'Segoe UI', sans-serif;
         background-color: white;
     }
+
+    /* Sidebar - Light Gray */
     [data-testid="stSidebar"] {
-        background-color: #ffffff;
+        background-color: #e0e0e0;
         color: #000000;
     }
+
+    /* Header Image */
     .header-image {
         width: auto;
         max-height: 200px;
         display: block;
         margin-left: auto;
         margin-right: auto;
+        margin-bottom: 10px;
     }
+
+    /* Footer - Dark Gray */
     .footer {
         position: fixed;
         left: 0;
         bottom: 0;
         width: 100%;
-        background-color: #f3f3f3;
-        border-top: 1px solid #ccc;
-        color: #333333;
+        background-color: #2c2c2c;
+        color: white;
         text-align: center;
         padding: 10px 0;
         font-size: 14px;
@@ -58,13 +64,13 @@ st.markdown("""
 st.markdown("""
     <div style="text-align: center;">
         <img src="https://i.imgur.com/JqfweEM.png" class="header-image" />
-        <h1 style="margin-top: 10px; font-size: 32px; color: #333333;">📚 Book Recommender App</h1>
+        <h1 style="margin-top: 5px; font-size: 32px; color: #333333;">📚 Book Recommender App</h1>
         <p style="font-size: 16px; color: #555;">Combining Content-Based, Collaborative, and Knowledge Graph Recommendations.</p>
     </div>
 """, unsafe_allow_html=True)
 
 # ----------------------------
-# 📥 Model Loaders
+# 📥 Load Models
 # ----------------------------
 @st.cache_resource
 def load_cbf_model():
@@ -103,7 +109,7 @@ user_similarity = models["user_similarity"]
 G = models["kg_graph"]
 
 # ----------------------------
-# 📦 Load Dataset
+# 📦 Load Data
 # ----------------------------
 @st.cache_data
 def load_data():
@@ -121,7 +127,7 @@ def load_data():
 df = load_data()
 
 # ----------------------------
-# 📚 Recommendation Functions
+# 🔍 Recommendation Functions
 # ----------------------------
 def recommend_cbf(book_id, top_n=5):
     if book_id not in cbf_sim_df.index:
@@ -163,7 +169,7 @@ def hybrid_recommend(user_id, book_id, top_n=5):
     return titles
 
 # ----------------------------
-# 🧭 Sidebar Search
+# 🧭 Sidebar Interface
 # ----------------------------
 st.sidebar.header("🔍 Search for a Book")
 search_option = st.sidebar.radio("Search by:", ["Title", "Author", "Publisher"])
@@ -198,6 +204,3 @@ st.markdown("""
     Mofoluke Sorinmade © 2025
 </div>
 """, unsafe_allow_html=True)
-
-
-
