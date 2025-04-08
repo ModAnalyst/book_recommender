@@ -177,29 +177,27 @@ st.set_page_config(page_title="📚 Book Recommender App", layout="wide")
 # ----------------------------
 st.markdown("""
     <style>
-    /* App background */
+    body {
+        background-color: #f9f9f9;
+    }
     .stApp {
         font-family: 'Segoe UI', sans-serif;
-        background-color: #ffffff;
+        background-color: white;
     }
-
-    /* Sidebar styling */
     [data-testid="stSidebar"] {
         background-color: #ffffff;
-        color: black;
+        color: #000000;
     }
-
-    /* Footer styling */
     .footer {
         position: fixed;
         left: 0;
         bottom: 0;
         width: 100%;
         background-color: #f3f3f3;
-        color: #333333;
         border-top: 1px solid #ccc;
+        color: #333333;
         text-align: center;
-        padding: 10px;
+        padding: 10px 0;
         font-size: 14px;
         z-index: 999;
     }
@@ -207,21 +205,17 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------
-# 🖼️ Full-width Banner Image from Google Drive
+# 🖼️ Header Banner Image
 # ----------------------------
 st.markdown("""
     <div style="text-align: center;">
-        <img src="https://drive.google.com/uc?export=view&id=1HkmLK0WZO66j4pKOm3gkprMYCM_uV6go" style="width: 100%; height: auto; border-radius: 10px;"/>
+        <img src="https://drive.google.com/uc?export=view&id=1HkmLK0WZO66j4pKOm3gkprMYCM_uV6go" style="width: 100%; height: auto; border-radius: 5px;"/>
     </div>
 """, unsafe_allow_html=True)
-
-st.title("📚 Book Recommender App")
-st.markdown("Combining Content-Based, Collaborative, and Knowledge Graph Recommendations.")
 
 # ----------------------------
 # 📥 Model Loaders
 # ----------------------------
-
 @st.cache_resource
 def load_cbf_model():
     file_id = "1yvm933TKSW2IG0AmPAXIdSvzonf2xT5a"
@@ -259,7 +253,7 @@ user_similarity = models["user_similarity"]
 G = models["kg_graph"]
 
 # ----------------------------
-# 📦 Load Book Dataset
+# 📦 Load Dataset
 # ----------------------------
 @st.cache_data
 def load_data():
@@ -277,7 +271,7 @@ def load_data():
 df = load_data()
 
 # ----------------------------
-# 📚 Recommendation Logic
+# 📚 Recommendation Functions
 # ----------------------------
 def recommend_cbf(book_id, top_n=5):
     if book_id not in cbf_sim_df.index:
@@ -319,7 +313,7 @@ def hybrid_recommend(user_id, book_id, top_n=5):
     return titles
 
 # ----------------------------
-# 🧭 Sidebar Controls
+# 🧭 Sidebar Search
 # ----------------------------
 st.sidebar.header("🔍 Search for a Book")
 search_option = st.sidebar.radio("Search by:", ["Title", "Author", "Publisher"])
@@ -350,8 +344,7 @@ if st.sidebar.button("📖 Recommend Books") and search_query:
 # 🔻 Footer
 # ----------------------------
 st.markdown("""
-    <div class="footer">
-        Mofoluke Sorinmade © 2025
-    </div>
+<div class="footer">
+    Mofoluke Sorinmade © 2025
+</div>
 """, unsafe_allow_html=True)
-
