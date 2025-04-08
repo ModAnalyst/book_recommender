@@ -157,8 +157,6 @@
 #         st.warning(f"❌ No books found for '{search_query}'. Try another keyword.")
 
 
-# app.py
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -175,51 +173,26 @@ import gdown
 st.set_page_config(page_title="📚 Book Recommender App", layout="wide")
 
 # ----------------------------
-# 🎨 Custom CSS Styling
-# ----------------------------
-# ----------------------------
-# 🎨 Updated CSS Styling
+# 🎨 CSS Styling
 # ----------------------------
 st.markdown("""
     <style>
-    /* Reset background and use subtle elegance */
     body {
         background-color: #f9f9f9;
         background-image: none;
         color: #333333;
     }
 
-    /* Streamlit app container */
     .stApp {
         font-family: 'Segoe UI', sans-serif;
         background-color: white;
     }
 
-    /* Sidebar - White background */
     [data-testid="stSidebar"] {
         background-color: #ffffff;
         color: #000000;
     }
 
-    /* Footer styling */
-    .footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background-color: #f3f3f3;
-        border-top: 1px solid #ccc;
-        color: #333333;
-        text-align: center;
-        padding: 10px 0;
-        font-size: 14px;
-        z-index: 999;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-
-    /* Footer bar */
     .footer {
         position: fixed;
         left: 0;
@@ -230,32 +203,20 @@ st.markdown("""
         text-align: center;
         padding: 10px;
         font-size: 14px;
-        z-index: 100;
+        z-index: 999;
     }
-
-    /* Sidebar tweaks */
-    [data-testid="stSidebar"] {
-        background-color: #111827;
-        color: white;
-    }
-
-    .css-1cpxqw2 {
-        background-color: #111827 !important;
-    }
-
     </style>
 """, unsafe_allow_html=True)
 
 # ----------------------------
-# 🖼️ Header Image (change as needed)
+# 🖼️ Header Image and Title
 # ----------------------------
-st.image("https://cdn-icons-png.flaticon.com/512/3123/3123682.png", width=100)  # <-- Replace with your new URL
-
+st.image("https://cdn-icons-png.flaticon.com/512/3123/3123682.png", width=100)
 st.title("📚 Book Recommender App")
 st.markdown("Combining Content-Based, Collaborative, and Knowledge Graph Recommendations.")
 
 # ----------------------------
-# 📥 Model Loaders (Same as yours)
+# 📥 Model Loaders
 # ----------------------------
 
 @st.cache_resource
@@ -355,12 +316,15 @@ def hybrid_recommend(user_id, book_id, top_n=5):
     return titles
 
 # ----------------------------
-# 🧭 Sidebar Controls
+# 🧭 Sidebar Search
 # ----------------------------
 st.sidebar.header("🔍 Search for a Book")
 search_option = st.sidebar.radio("Search by:", ["Title", "Author", "Publisher"])
 search_query = st.sidebar.text_input(f"Enter part of the {search_option.lower()}")
 
+# ----------------------------
+# 🚀 Trigger Recommendations
+# ----------------------------
 if st.sidebar.button("📖 Recommend Books") and search_query:
     if search_option == "Title":
         match = df[df['title'].str.contains(search_query, case=False, na=False)]
@@ -390,4 +354,3 @@ st.markdown("""
     Mofoluke Sorinmade © 2025
 </div>
 """, unsafe_allow_html=True)
-
