@@ -177,25 +177,47 @@ st.set_page_config(page_title="📚 Book Recommender App", layout="wide")
 # ----------------------------
 # 🎨 Custom CSS Styling
 # ----------------------------
+# ----------------------------
+# 🎨 Updated CSS Styling
+# ----------------------------
 st.markdown("""
     <style>
-    /* Background: subtle blue-black tone with faint red stripes */
+    /* Reset background and use subtle elegance */
     body {
-        background-color: #0b1a2d;
-        background-image: repeating-linear-gradient(
-            45deg,
-            #0b1a2d,
-            #0b1a2d 40px,
-            rgba(255, 0, 0, 0.05) 40px,
-            rgba(255, 0, 0, 0.05) 80px
-        );
-        color: white;
+        background-color: #f9f9f9;
+        background-image: none;
+        color: #333333;
     }
 
-    /* Adjust text appearance */
+    /* Streamlit app container */
     .stApp {
         font-family: 'Segoe UI', sans-serif;
+        background-color: white;
     }
+
+    /* Sidebar - White background */
+    [data-testid="stSidebar"] {
+        background-color: #ffffff;
+        color: #000000;
+    }
+
+    /* Footer styling */
+    .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: #f3f3f3;
+        border-top: 1px solid #ccc;
+        color: #333333;
+        text-align: center;
+        padding: 10px 0;
+        font-size: 14px;
+        z-index: 999;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 
     /* Footer bar */
     .footer {
