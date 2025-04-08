@@ -157,32 +157,85 @@
 #         st.warning(f"❌ No books found for '{search_query}'. Try another keyword.")
 
 
+# app.py
 
 import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
-import networkx as nx
 import pickle
+import networkx as nx
 import gzip
 import os
 import gdown
 
-# ----------------------------------------
-# 🎯 Page Setup
-# ----------------------------------------
-st.set_page_config(page_title="📘 Book Recommender App", layout="wide")
+# ----------------------------
+# 🎯 Page Configuration
+# ----------------------------
+st.set_page_config(page_title="📚 Book Recommender App", layout="wide")
 
-# Optional Header Image (replace with your own if desired)
-st.image("https://cdn-icons-png.flaticon.com/512/29/29302.png", width=100)  # Book icon URL
+# ----------------------------
+# 🎨 Custom CSS Styling
+# ----------------------------
+st.markdown("""
+    <style>
+    /* Background: subtle blue-black tone with faint red stripes */
+    body {
+        background-color: #0b1a2d;
+        background-image: repeating-linear-gradient(
+            45deg,
+            #0b1a2d,
+            #0b1a2d 40px,
+            rgba(255, 0, 0, 0.05) 40px,
+            rgba(255, 0, 0, 0.05) 80px
+        );
+        color: white;
+    }
 
-# App Title and Subheader
-st.title("📘 Book Recommender App")
-st.markdown("Combines Content-Based, Collaborative, and Knowledge Graph filtering to recommend books you’ll love!")
+    /* Adjust text appearance */
+    .stApp {
+        font-family: 'Segoe UI', sans-serif;
+    }
 
-# ----------------------------------------
-# 📥 Load from Google Drive (Large Files)
-# ----------------------------------------
+    /* Footer bar */
+    .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: #1f2937;
+        color: white;
+        text-align: center;
+        padding: 10px;
+        font-size: 14px;
+        z-index: 100;
+    }
+
+    /* Sidebar tweaks */
+    [data-testid="stSidebar"] {
+        background-color: #111827;
+        color: white;
+    }
+
+    .css-1cpxqw2 {
+        background-color: #111827 !important;
+    }
+
+    </style>
+""", unsafe_allow_html=True)
+
+# ----------------------------
+# 🖼️ Header Image (change as needed)
+# ----------------------------
+st.image("https://cdn-icons-png.flaticon.com/512/3123/3123682.png", width=100)  # <-- Replace with your new URL
+
+st.title("📚 Book Recommender App")
+st.markdown("Combining Content-Based, Collaborative, and Knowledge Graph Recommendations.")
+
+# ----------------------------
+# 📥 Model Loaders (Same as yours)
+# ----------------------------
+
 @st.cache_resource
 def load_cbf_model():
     file_id = "1yvm933TKSW2IG0AmPAXIdSvzonf2xT5a"
@@ -219,9 +272,9 @@ user_book_matrix = models["user_book_matrix"]
 user_similarity = models["user_similarity"]
 G = models["kg_graph"]
 
-# ----------------------------------------
-# 📘 Load Data
-# ----------------------------------------
+# ----------------------------
+# 📦 Load Book Dataset
+# ----------------------------
 @st.cache_data
 def load_data():
     df = pd.read_csv("books.csv", on_bad_lines='skip')
@@ -237,9 +290,9 @@ def load_data():
 
 df = load_data()
 
-# ----------------------------------------
-# 🔍 Recommendation Functions
-# ----------------------------------------
+# ----------------------------
+# 📚 Recommendation Logic
+# ----------------------------
 def recommend_cbf(book_id, top_n=5):
     if book_id not in cbf_sim_df.index:
         return []
@@ -279,16 +332,13 @@ def hybrid_recommend(user_id, book_id, top_n=5):
     titles = df[df['bookID'].isin(top_recs)][['bookID', 'title', 'authors', 'publisher']].drop_duplicates()
     return titles
 
-# ----------------------------------------
-# 🎛️ Sidebar: Search UI
-# ----------------------------------------
+# ----------------------------
+# 🧭 Sidebar Controls
+# ----------------------------
 st.sidebar.header("🔍 Search for a Book")
 search_option = st.sidebar.radio("Search by:", ["Title", "Author", "Publisher"])
 search_query = st.sidebar.text_input(f"Enter part of the {search_option.lower()}")
 
-# ----------------------------------------
-# 🚀 Trigger Recommendation
-# ----------------------------------------
 if st.sidebar.button("📖 Recommend Books") and search_query:
     if search_option == "Title":
         match = df[df['title'].str.contains(search_query, case=False, na=False)]
@@ -300,22 +350,22 @@ if st.sidebar.button("📖 Recommend Books") and search_query:
     if not match.empty:
         book_id = match.iloc[0]['bookID']
         user_id = 1
-        with st.spinner("Finding similar books..."):
+        with st.spinner("Generating recommendations..."):
             recs = hybrid_recommend(user_id, book_id, top_n=5)
-
         if not recs.empty:
-            st.subheader("📚 Recommended Books Just for You")
+            st.subheader("📚 Recommended Books")
             st.table(recs.set_index('bookID'))
         else:
             st.warning("⚠️ No recommendations found.")
     else:
-        st.warning(f"❌ No books found for '{search_query}'. Try a different keyword.")
+        st.warning(f"❌ No books found for '{search_query}'. Try another keyword.")
 
-# ----------------------------------------
-# 🧾 Footer
-# ----------------------------------------
-st.markdown("---")
-st.markdown(
-    "<p style='text-align:center; color:gray;'>Mofoluke Sorinmade © 2025</p>",
-    unsafe_allow_html=True
-)
+# ----------------------------
+# 🔻 Footer
+# ----------------------------
+st.markdown("""
+<div class="footer">
+    Mofoluke Sorinmade © 2025
+</div>
+""", unsafe_allow_html=True)
+
