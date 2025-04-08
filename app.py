@@ -188,6 +188,12 @@ st.markdown("""
         background-color: #ffffff;
         color: #000000;
     }
+    .header-image {
+        width: 100%;
+        height: auto;
+        margin-bottom: 20px;
+        border-radius: 0px;
+    }
     .footer {
         position: fixed;
         left: 0;
@@ -208,9 +214,7 @@ st.markdown("""
 # 🖼️ Header Banner Image
 # ----------------------------
 st.markdown("""
-    <div style="text-align: center;">
-        <img src="https://drive.google.com/uc?export=view&id=1HkmLK0WZO66j4pKOm3gkprMYCM_uV6go" style="width: 100%; height: auto; border-radius: 5px;"/>
-    </div>
+    <img src="https://i.imgur.com/JqfweEM.png" class="header-image" />
 """, unsafe_allow_html=True)
 
 # ----------------------------
@@ -348,3 +352,4 @@ st.markdown("""
     Mofoluke Sorinmade © 2025
 </div>
 """, unsafe_allow_html=True)
+
