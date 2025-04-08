@@ -173,33 +173,31 @@ import gdown
 st.set_page_config(page_title="📚 Book Recommender App", layout="wide")
 
 # ----------------------------
-# 🎨 CSS Styling
+# 🎨 Custom CSS Styling
 # ----------------------------
 st.markdown("""
     <style>
-    body {
-        background-color: #f9f9f9;
-        background-image: none;
-        color: #333333;
-    }
-
+    /* App background */
     .stApp {
         font-family: 'Segoe UI', sans-serif;
-        background-color: white;
+        background-color: #ffffff;
     }
 
+    /* Sidebar styling */
     [data-testid="stSidebar"] {
         background-color: #ffffff;
-        color: #000000;
+        color: black;
     }
 
+    /* Footer styling */
     .footer {
         position: fixed;
         left: 0;
         bottom: 0;
         width: 100%;
-        background-color: #1f2937;
-        color: white;
+        background-color: #f3f3f3;
+        color: #333333;
+        border-top: 1px solid #ccc;
         text-align: center;
         padding: 10px;
         font-size: 14px;
@@ -209,9 +207,14 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------
-# 🖼️ Header Image and Title
+# 🖼️ Full-width Banner Image from Google Drive
 # ----------------------------
-st.image("https://cdn-icons-png.flaticon.com/512/3123/3123682.png", width=100)
+st.markdown("""
+    <div style="text-align: center;">
+        <img src="https://drive.google.com/uc?export=view&id=1HkmLK0WZO66j4pKOm3gkprMYCM_uV6go" style="width: 100%; height: auto; border-radius: 10px;"/>
+    </div>
+""", unsafe_allow_html=True)
+
 st.title("📚 Book Recommender App")
 st.markdown("Combining Content-Based, Collaborative, and Knowledge Graph Recommendations.")
 
@@ -316,15 +319,12 @@ def hybrid_recommend(user_id, book_id, top_n=5):
     return titles
 
 # ----------------------------
-# 🧭 Sidebar Search
+# 🧭 Sidebar Controls
 # ----------------------------
 st.sidebar.header("🔍 Search for a Book")
 search_option = st.sidebar.radio("Search by:", ["Title", "Author", "Publisher"])
 search_query = st.sidebar.text_input(f"Enter part of the {search_option.lower()}")
 
-# ----------------------------
-# 🚀 Trigger Recommendations
-# ----------------------------
 if st.sidebar.button("📖 Recommend Books") and search_query:
     if search_option == "Title":
         match = df[df['title'].str.contains(search_query, case=False, na=False)]
@@ -350,7 +350,8 @@ if st.sidebar.button("📖 Recommend Books") and search_query:
 # 🔻 Footer
 # ----------------------------
 st.markdown("""
-<div class="footer">
-    Mofoluke Sorinmade © 2025
-</div>
+    <div class="footer">
+        Mofoluke Sorinmade © 2025
+    </div>
 """, unsafe_allow_html=True)
+
